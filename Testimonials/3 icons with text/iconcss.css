@@ -1,0 +1,19 @@
+#shopify-section-why-choose-us-section {
+    background-color: white;
+    padding: 60px 0;
+}
+
+.why-us-block {
+    float: left;
+    width: 33.33%;
+    text-align: center;
+    color: black;
+    padding: 0 25px;
+}
+
+.why-us-blocks:before,
+.why-us-blocks:after {
+    content: "";
+    display: table;
+    clear: both;
+}
