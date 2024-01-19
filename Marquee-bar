@@ -1,0 +1,141 @@
+<div class="marquee-container page-width">
+ <div class="marquee">
+  <img src="{{ section.settings.logo_url }}" alt="{{ section.settings.logo_alt }}">
+  {% for block in section.blocks %}
+    <span alt="{{ block.settings.span_text }}">{{ block.settings.span_text }}</span>
+  {% endfor %}
+</div>
+</div>
+
+<style>
+.marquee-container {
+  width: 100%;
+  height: 4em;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 10px;
+  overflow: hidden;
+  border-color: {{ section.settings.border_color }}; 
+}
+  
+.marquee-bar {
+  width: 100%;
+  padding: 10px;
+  overflow: hidden;
+}
+  
+.marquee {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+}
+
+.marquee span {
+  font-family: "Dassie";
+  color: {{ section.settings.text_color }};
+  font-size: 22px;
+  text-transform: uppercase;
+  margin-right: 20px;
+  text-shadow: 1px 1px 5px white;
+}
+
+@media (max-width: 768px) {
+  .marquee {
+    animation: marquee 10s linear infinite;
+  }
+}
+
+@media (min-width: 769px) {
+  .marquee {
+    animation: marquee 30s linear infinite;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+</style>
+
+<script>
+var marquee = document.querySelector('.marquee');
+
+marquee.addEventListener('mouseover', function () {
+  marquee.style.animationPlayState = 'paused';
+});
+
+marquee.addEventListener('mouseout', function () {
+  marquee.style.animationPlayState = 'running';
+});
+</script>
+
+{% schema %}
+{
+  "name": "Marquee Bar",
+  "tag": "section",
+  "class": "marquee-bar",
+  "settings": [
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#65301C",  
+      "info": "Choose the color for the span text."
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#65301C",  
+      "info": "Choose the color for the marquee container border."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "marquee_block",
+      "name": "Marquee Block",
+      "settings": [
+        {
+          "type": "url",
+          "id": "logo_url",
+          "label": "Logo URL",
+          "default": "/",
+          "info": "Enter the URL for the logo/icon image."
+        },
+        {
+          "type": "text",
+          "id": "logo_alt",
+          "label": "Logo Alt Text",
+          "default": "Logo",
+          "info": "Enter the alt text for the logo/icon image."
+        },
+        {
+          "type": "text",
+          "id": "span_text",
+          "label": "Span Text",
+          "default": "Your Text Here"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee Bar",
+      "category": "Custom",
+      "blocks": [
+        {
+          "type": "marquee_block"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+
