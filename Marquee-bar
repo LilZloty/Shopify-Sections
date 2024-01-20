@@ -1,4 +1,4 @@
-<div class="marquee-container page-width">
+<div class="marquee-container">
   <div class="marquee">
     <img src="{{ section.settings.logo_url }}" alt="{{ section.settings.logo_alt }}">
     {% for block in section.blocks %}
