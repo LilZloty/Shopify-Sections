@@ -1,20 +1,20 @@
 <div class="marquee-container page-width">
- <div class="marquee">
-  <img src="{{ section.settings.logo_url }}" alt="{{ section.settings.logo_alt }}">
-  {% for block in section.blocks %}
-    <span alt="{{ block.settings.span_text }}">{{ block.settings.span_text }}</span>
-  {% endfor %}
-</div>
+  <div class="marquee">
+    <img src="{{ section.settings.logo_url }}" alt="{{ section.settings.logo_alt }}">
+    {% for block in section.blocks %}
+      <span alt="{{ block.settings.span_text }}">{{ block.settings.span_text }}</span>
+    {% endfor %}
+  </div>
 </div>
 
 <style>
 .marquee-container {
   width: 100%;
-  height: 4em;
   border: 1px solid;
   border-radius: 10px;
   padding: 10px;
   overflow: hidden;
+  text-align: center;
   border-color: {{ section.settings.border_color }}; 
 }
   
@@ -35,13 +35,17 @@
 .marquee span {
   font-family: "Dassie";
   color: {{ section.settings.text_color }};
-  font-size: 22px;
   text-transform: uppercase;
   margin-right: 20px;
   text-shadow: 1px 1px 5px white;
+  font-size: {{ section.settings.global_font_size }}px;
 }
 
 @media (max-width: 768px) {
+  .marquee span {
+    font-size: {{ section.settings.mobile_font_size }}px;
+  }
+
   .marquee {
     animation: marquee 10s linear infinite;
   }
@@ -94,6 +98,26 @@ marquee.addEventListener('mouseout', function () {
       "label": "Border Color",
       "default": "#65301C",  
       "info": "Choose the color for the marquee container border."
+    },
+    {
+      "type": "range",
+      "id": "global_font_size",
+      "label": "Desktop Font Size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "default": 22,
+      "info": "Choose the global font size for all spans."
+    },
+    {
+      "type": "range",
+      "id": "mobile_font_size",
+      "label": "Mobile Font Size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "default": 18,
+      "info": "Choose the font size for mobile devices."
     }
   ],
   "blocks": [
@@ -137,5 +161,3 @@ marquee.addEventListener('mouseout', function () {
   ]
 }
 {% endschema %}
-
-
