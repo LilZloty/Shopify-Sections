@@ -1,0 +1,148 @@
+<div class="marquee-container">
+  <div class="marquee">
+    {% for block in section.blocks %}
+      <span alt="{{ block.settings.span_text }}">{{ block.settings.span_text }}</span>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+.marquee-container {
+  width: 100%;
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 10px;
+  overflow: hidden;
+  text-align: center;
+  border-color: {{ section.settings.border_color }}; 
+}
+  
+.marquee-bar {
+  width: 100%;
+  padding: 10px;
+  overflow: hidden;
+}
+  
+.marquee {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+}
+
+.marquee span {
+  font-family: "Dassie";
+  color: {{ section.settings.text_color }};
+  text-transform: uppercase;
+  margin-right: 20px;
+  text-shadow: 1px 1px 5px white;
+  font-size: {{ section.settings.global_font_size }}px;
+}
+
+@media (max-width: 768px) {
+  .marquee span {
+    font-size: {{ section.settings.mobile_font_size }}px;
+  }
+
+  .marquee {
+    animation: marquee 10s linear infinite;
+  }
+}
+
+@media (min-width: 769px) {
+  .marquee {
+    animation: marquee 30s linear infinite;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+</style>
+
+<script>
+var marquee = document.querySelector('.marquee');
+
+marquee.addEventListener('mouseover', function () {
+  marquee.style.animationPlayState = 'paused';
+});
+
+marquee.addEventListener('mouseout', function () {
+  marquee.style.animationPlayState = 'running';
+});
+</script>
+
+{% schema %}
+{
+  "name": "Marquee Bar",
+  "tag": "section",
+  "class": "marquee-bar",
+  "settings": [
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#65301C",  
+      "info": "Choose the color for the span text."
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#65301C",  
+      "info": "Choose the color for the marquee container border."
+    },
+    {
+      "type": "range",
+      "id": "global_font_size",
+      "label": "Desktop Font Size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "default": 22,
+      "info": "Choose the global font size for all spans."
+    },
+    {
+      "type": "range",
+      "id": "mobile_font_size",
+      "label": "Mobile Font Size",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "default": 18,
+      "info": "Choose the font size for mobile devices."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "marquee_block",
+      "name": "Marquee Block",
+      "settings": [
+        {
+          "type": "text",
+          "id": "span_text",
+          "label": "Span Text",
+          "default": "Your Text Here"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee Bar",
+      "category": "Custom",
+      "blocks": [
+        {
+          "type": "marquee_block"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
