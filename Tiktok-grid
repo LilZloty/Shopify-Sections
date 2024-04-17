@@ -1,0 +1,155 @@
+<div class="social-media-content h1 scroll-trigger animate--slide-in page-width">
+  {% if section.settings.tiktok_url_1 != blank %}
+    <div class="tiktok-content">
+      <video src="{{ section.settings.tiktok_url_1 }}" controls loading="lazy"></video>
+    </div>
+  {% endif %}
+  {% if section.settings.tiktok_url_2 != blank %}
+    <div class="tiktok-content">
+      <video src="{{ section.settings.tiktok_url_2 }}" controls loading="lazy"></video>
+    </div>
+  {% endif %}
+  {% if section.settings.tiktok_url_3 != blank %}
+    <div class="tiktok-content">
+      <video src="{{ section.settings.tiktok_url_3 }}" controls loading="lazy"></video>
+    </div>
+  {% endif %}
+  {% if section.settings.tiktok_url_4 != blank %}
+    <div class="tiktok-content">
+      <video src="{{ section.settings.tiktok_url_4 }}" controls loading="lazy"></video>
+    </div>
+  {% endif %}
+  
+  <div class="button-container">
+    {%- if section.settings.button_label != blank -%}
+      <a
+        {% if section.settings.button_link == blank %}
+          role="link" aria-disabled="true"
+        {% else %}
+          href="{{ section.settings.button_link }}"
+        {% endif %}
+        class="tiktok-button"
+      >
+        {{- section.settings.button_label | escape -}}
+      </a>
+    {%- endif -%}
+  </div>
+</div>
+
+
+<style> 
+.social-media-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start; /* Align items to the top */
+  text-align: center; /* Center align the content */
+}
+
+.tiktok-content {
+  flex: 1 1 calc(25% - 20px);
+  max-width: calc(25% - 20px);
+  position: relative;
+}
+
+.tiktok-content video {
+  width: 100%;
+  max-height: 720px;
+  object-fit: cover;
+}
+
+.button-container {
+  width: 100%;
+  margin-top: 20px; /* Add margin to separate from TikTok videos */
+}
+
+.tiktok-button {
+  background-color: #EF2950;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 18px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.tiktok-button:hover {
+  background-color: #ff5678; 
+}
+
+/* Desktops and larger screens */
+@media (min-width: 1025px) {
+  .tiktok-content {
+    flex: 1 1 calc(25% - 20px);
+    max-width: calc(25% - 20px);
+  }
+}
+  
+@media (max-width: 768px) {
+  .social-media-content {
+    flex-wrap: wrap;
+    justify-content: flex-start; /* Align items to the start */
+  }
+
+  .tiktok-content {
+    flex: 1 1 calc(50% - 10px); /* Two clips per row */
+    max-width: calc(50% - 10px); /* Two clips per row */
+  }
+
+  .tiktok-button {
+    width: 100%; /* Full width button */
+    margin-top: 20px; /* Add margin to separate from TikTok videos */
+  }
+}
+
+
+</style>
+
+{% schema %}
+{
+  "name": "Tiktok",
+  "tag": "section",
+  "class": "tiktok-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "tiktok_url_1",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "text",
+      "id": "tiktok_url_2",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "text",
+      "id": "tiktok_url_3",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "text",
+      "id": "tiktok_url_4",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "TikTok",
+      "category": "Social Media"
+    }
+  ]
+}
+{% endschema %}
+
+
