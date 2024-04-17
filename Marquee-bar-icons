@@ -1,0 +1,144 @@
+<div class="loop-holder-collection" style="background-color:{{section.settings.background-color }}">
+  <div class="loop-holder__text-collection" style="color: {{section.settings.text-color }}; ">
+  {% for block in section.blocks %}
+    <!-- Where you can change the image or the icon -->
+   <span>
+     <img class="picto-loop" src="{{ block.settings.image | img_url: width: 24 }}"> 
+   </span>
+    <!-- Where you can change the text next to the icon/image -->
+    {{ block.settings.text }} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+    {% endfor %} 
+  </div>
+</div>
+
+
+{% schema %}
+{
+  "name": "Loop Bar",
+  "tag": "section",
+  "class": "section",
+  "settings":[
+      {
+          "type": "color",
+          "id": "background-color",
+          "label": "Background color"
+        },
+    {
+          "type": "color",
+          "id": "text-color",
+          "label": "Text color"
+        },
+    {
+          "type": "range",
+          "id": "font-size",
+          "min": 12,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "label": "Font size",
+          "default": 16
+        }
+  ],
+   "blocks": [{
+      "type": "image",
+      "name": "Choose your Image or Icon",
+      "settings": [{
+            "type": "header",
+            "content": "Icon Image"
+         },
+         {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+         },
+       {
+          "type": "text",
+          "id": "text",
+          "default": "Add your text",
+          "label": "Text"
+        }
+
+      ]
+   }],
+  "presets": [{
+      "name": "Loop bar",
+      "category": "Image/Icon",
+      "blocks": [{
+         "type": "image"
+      }]
+   }]
+}
+{% endschema %}
+
+{% stylesheet %}
+
+  .loop-holder {
+  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  background-color: #D19F74;
+  height: 35px;
+  align-items: center; }
+
+.loop-holder__text {
+  animation: textLoop 30s linear infinite;
+  font-size: 18px;
+  font-weight: 500;
+  padding-right: 7.3em;
+
+}
+
+@keyframes textLoop {
+  0% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0); }
+
+  100% {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0); } }
+
+.picto-loop {
+  margin-bottom: 5px; 
+}
+
+
+.loop-holder-collection {
+  display: flex;
+  white-space: nowrap;
+  overflow: hidden;
+  height: 55px;
+  align-items: center; }
+
+.loop-holder__text-collection {
+  animation: textLoop 45s linear infinite;
+  font-size: 20px;
+  font-weight: 500;
+  padding-right: 13.3em;
+}
+  @media (min-width: 0px) and (max-width: 460px) {
+    .loop-holder__text-collection {
+      font-size: 18px; } }
+
+.shopify-section.collection-section.full-header {
+  background: #FBF8F5;
+  padding-top: 25px; }
+
+.loop-holder__text-collection img {
+  margin-bottom: 3px;
+  height: 1.5em;
+  width: 1.5em;
+  display: inline-block;
+  vertical-align: middle;
+
+
+}
+
+@keyframes textLoop {
+  0% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0); }
+
+  100% {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0); } }
+{% endstylesheet %}
