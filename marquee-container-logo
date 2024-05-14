@@ -1,0 +1,203 @@
+<div class="marquee-container-logo section-{{ section.id }}-padding">
+  {% if section.settings.section_heading != blank %}
+    <h2 class="section-heading">{{ section.settings.section_heading }}</h2>
+  {% endif %}
+  <div class="marquee-logo">
+    <div class="marquee-track">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'logo' %}
+            {% assign logo_image_url = block.settings.logo_image | img_url: 'master' %}
+            <div class="marquee-item">
+              <a href="{{ block.settings.logo_link }}" target="_blank">
+                           <img src="{{ logo_image_url }}" loading="lazy" alt="{{ block.settings.logo_image.alt }}" style="max-width: {% if section.settings.logo_size_desktop > 0 %}{{ section.settings.logo_size_desktop }}px{% else %}auto{% endif %};">
+              </a>
+            </div>
+        {% endcase %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% style %}
+    .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+  
+/* Base styles */
+.marquee-container-logo {
+  overflow: hidden;
+  text-align: center; /* Center align content */
+}
+
+.marquee-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center align logos horizontally */
+  padding: 0 10px;
+  overflow: hidden;
+}
+
+.marquee-track {
+  white-space: nowrap;
+}
+
+.marquee-item {
+  display: inline-block;
+  margin-right: {{ section.settings.logo_spacing_desktop }}px; /* Spacing between logos (desktop) */
+}
+
+.marquee-item:last-child {
+  margin-right: 0;
+}
+
+.marquee-item img {
+  max-width: 100%; /* Ensure images are responsive */
+  height: auto;
+  display: block; /* Ensure images are block-level for proper alignment */
+  margin: 0 auto; /* Center align images */
+}
+
+@media (max-width: 767px) {
+  .marquee-item {
+    display: block;
+    margin: {{ section.settings.logo_spacing_mobile }}px auto;
+    text-align: center;
+  }
+  
+  /* Adjust logo size for mobile */
+  .marquee-item img {
+    max-width: {{ section.settings.logo_size_mobile }}px;
+  }
+}
+
+{% endstyle %}
+
+
+{% schema %}
+{
+  "name": "Marquee Logos",
+  "tag": "section",
+  "class": "marquee-container-logo",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Section Heading"
+    },
+    {
+      "type": "range",
+      "id": "logo_spacing_desktop",
+      "label": "Logo Spacing (Desktop)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "logo_spacing_mobile",
+      "label": "Logo Spacing (Mobile)",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "logo_size_desktop",
+      "label": "Logo Size (Desktop)",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "logo_size_mobile",
+      "label": "Logo Size (Mobile)",
+      "min": 50,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 52
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "logo_image",
+          "label": "Logo Image"
+        },
+        {
+          "type": "url",
+          "id": "logo_link",
+          "label": "Logo Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee Logos",
+      "category": "Image",
+      "blocks": [
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        }
+      ]
+    }
+  ],
+  "locales": {
+    "en": {
+      "name": "Marquee Logos",
+      "section_heading": "Featured Logos"
+    },
+    "fr": {
+      "name": "Logos de défilement",
+      "section_heading": "Logos en vedette"
+    }
+  }
+}
+{% endschema %}
