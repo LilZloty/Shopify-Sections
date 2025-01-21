@@ -1,0 +1,323 @@
+{{ 'section-video-grid.css' | asset_url | stylesheet_tag }}
+{{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .video-grid-{{ section.id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: var(--page-width);
+    margin: 0 auto;
+    align-items: stretch;
+  }
+
+  .video-grid__item-{{ section.id }} {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-grid__item-{{ section.id }}[data-video-type="shorts"] {
+    aspect-ratio: 9/16;
+    min-height: 640px;
+  }
+
+  .video-grid__media-{{ section.id }} {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .video-grid__media-{{ section.id }} iframe,
+  .video-grid__media-{{ section.id }} video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-grid__media-{{ section.id }} .video-shorts {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+  }
+
+  .video-grid__content-{{ section.id }} {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 2rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    z-index: 2;
+  }
+
+  .video-grid__title {
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .video-grid__text {
+    color: #ffffff;
+    font-size: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  @media screen and (max-width: 989px) {
+    .video-grid-{{ section.id }} {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .video-grid__item-{{ section.id }}[data-video-type="shorts"] {
+      min-height: 500px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .video-grid-{{ section.id }} {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+    }
+
+    .video-grid__item-{{ section.id }}[data-video-type="shorts"] {
+      min-height: 400px;
+    }
+
+    .video-grid__content-{{ section.id }} {
+      padding: 1.5rem;
+    }
+  }
+{%- endstyle -%}
+
+<div class="section-{{ section.id }}-padding">
+  {% if section.settings.title != blank %}
+    <h2 class="page-width text-center">{{ section.settings.title }}</h2>
+  {% endif %}
+  
+  <div class="video-grid-{{ section.id }} page-width">
+    {% for block in section.blocks %}
+      <div class="video-grid__item-{{ section.id }}" 
+           {{ block.shopify_attributes }}
+           data-video-type="{{ block.settings.video_type }}">
+        {%- liquid
+          if block.settings.video_type == 'shorts'
+            assign shorts_url = block.settings.shorts_url
+            assign video_id = ''
+            
+            if shorts_url contains '/shorts/'
+              assign video_parts = shorts_url | split: '/shorts/'
+              if video_parts.size > 1
+                assign raw_id = video_parts.last
+                assign video_id = raw_id | split: '?si=' | first | strip
+              endif
+            endif
+          else
+            assign video_url = block.settings.video_url
+            assign video_id = video_url.id
+          endif
+        -%}
+
+        <div class="video-grid__media-{{ section.id }} deferred-media" data-media-id="{{ video_id }}">
+          {%- if block.settings.video_type == 'shorts' and video_id != blank -%}
+          <iframe
+            src="https://www.youtube.com/embed/{{ video_id }}"
+            class="js-youtube video-shorts"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowfullscreen
+            frameborder="0"
+            loading="lazy"
+          ></iframe>
+          {%- elsif block.settings.video_url.type == 'youtube' -%}
+            <iframe
+              src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&mute=1&controls=1&enablejsapi=1&loop=1&playlist={{ video_id }}&playsinline=1&rel=0&showinfo=0&vq={{ section.settings.video_quality }}p"
+              class="js-youtube"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowfullscreen
+              frameborder="0"
+              title="{{ block.settings.title | escape }}"
+            ></iframe>
+          {%- elsif block.settings.video_url.type == 'vimeo' -%}
+            <iframe
+              src="https://player.vimeo.com/video/{{ video_id }}?autoplay=1&mute=1&controls=1&background=1&loop=1&quality={{ section.settings.video_quality }}p"
+              class="js-vimeo"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowfullscreen
+              frameborder="0"
+              title="{{ block.settings.title | escape }}"
+            ></iframe>
+          {%- else -%}
+            {{
+              block.settings.video
+              | video_tag:
+                autoplay: true,
+                loop: true,
+                muted: true,
+                controls: true,
+                playsinline: true,
+                class: 'video-grid__video'
+            }}
+          {%- endif -%}
+        </div>
+
+        {% if block.settings.title != blank or block.settings.text != blank %}
+          <div class="video-grid__content-{{ section.id }}">
+            {% if block.settings.title != blank %}
+              <h3 class="video-grid__title">{{ block.settings.title }}</h3>
+            {% endif %}
+            {% if block.settings.text != blank %}
+              <div class="video-grid__text">{{ block.settings.text }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Video Grid",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Video Grid"
+    },
+    {
+      "type": "select",
+      "id": "video_quality",
+      "label": "Video Quality",
+      "options": [
+        {
+          "value": "720",
+          "label": "720p"
+        },
+        {
+          "value": "1080",
+          "label": "1080p"
+        },
+        {
+          "value": "1440",
+          "label": "1440p"
+        }
+      ],
+      "default": "1080"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video",
+      "limit": 3,
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Video Title"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "Add a short description"
+        },
+        {
+          "type": "select",
+          "id": "video_type",
+          "label": "YouTube Video Type",
+          "options": [
+            {
+              "value": "regular",
+              "label": "Regular Video"
+            },
+            {
+              "value": "shorts",
+              "label": "Shorts/Reels"
+            }
+          ],
+          "default": "regular"
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "accept": ["youtube", "vimeo"],
+          "label": "Regular Video URL",
+          "info": "For regular YouTube or Vimeo videos"
+        },
+        {
+          "type": "text",
+          "id": "shorts_url",
+          "label": "Shorts URL",
+          "info": "Paste the complete YouTube Shorts URL (e.g., https://youtube.com/shorts/ABC123?si=...)"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video file"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video Grid",
+      "blocks": [
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
