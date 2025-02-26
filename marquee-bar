@@ -1,20 +1,32 @@
-<div class="marquee-container">
+<div class="marquee-container" style="background-color: {{ section.settings.background_color }};">
   <div class="marquee">
-    {% for block in section.blocks %}
-      <span alt="{{ block.settings.span_text }}">{{ block.settings.span_text }}</span>
-    {% endfor %}
+    <div class="marquee-track">
+      <div class="marquee-content">
+        {% for block in section.blocks %}
+          <span class="marquee-item" {{ block.shopify_attributes }}>{{ block.settings.span_text }}</span>
+        {% endfor %}
+      </div>
+      
+      <div class="marquee-content" aria-hidden="true">
+        {% for block in section.blocks %}
+          <span class="marquee-item">{{ block.settings.span_text }}</span>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 </div>
 
-<style>
+{% style %}
 .marquee-container {
   width: 100%;
-  border: 1px solid;
-  border-radius: 10px;
-  padding: 10px;
+  border: {{ section.settings.border_width }}px solid;
+  border-radius: {{ section.settings.border_radius }}px;
+  padding: {{ section.settings.padding }}px;
   overflow: hidden;
   text-align: center;
   border-color: {{ section.settings.border_color }}; 
+  margin-top: {{ section.settings.margin_top }}px;
+  margin-bottom: {{ section.settings.margin_bottom }}px;
 }
   
 .marquee-bar {
@@ -24,59 +36,83 @@
 }
   
 .marquee {
-  white-space: nowrap;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 10px;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
 }
 
-.marquee span {
-  font-family: "Dassie";
+.marquee-track {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+  {% if section.settings.pause_on_hover %}
+  &:hover {
+    animation-play-state: paused;
+  }
+  {% endif %}
+  {% if section.settings.double_content %}
+  animation: marquee {{ section.settings.scroll_speed }}s linear infinite;
+  {% endif %}
+}
+
+.marquee-content {
+  display: inline-flex;
+  flex-shrink: 0;
+  min-width: 100%;
+  white-space: nowrap;
+  {% unless section.settings.double_content %}
+  animation: marquee {{ section.settings.scroll_speed }}s linear infinite;
+  {% endunless %}
+}
+
+.marquee-item {
+  {% if section.settings.font_style == 'heading' %}
+    font-family: var(--font-heading-family) !important;
+    font-weight: {{ settings.heading_scale | times: 100 | default: 400 }};
+  {% else %}
+    font-family: var(--font-body-family) !important;
+    font-weight: {{ settings.body_scale | times: 100 | default: 400 }};
+  {% endif %}
   color: {{ section.settings.text_color }};
-  text-transform: uppercase;
-  margin-right: 20px;
-  text-shadow: 1px 1px 5px white;
+  {% if section.settings.text_transform != 'none' %}
+    text-transform: {{ section.settings.text_transform }};
+  {% endif %}
+  padding: 0 {{ section.settings.item_spacing }}px;
+  {% if section.settings.text_shadow %}
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  {% endif %}
   font-size: {{ section.settings.global_font_size }}px;
+  display: inline-block;
+  flex-shrink: 0;
 }
 
-@media (max-width: 768px) {
-  .marquee span {
+@media screen and (max-width: 768px) {
+  .marquee-item {
     font-size: {{ section.settings.mobile_font_size }}px;
+    padding: 0 {{ section.settings.item_spacing | divided_by: 2 }}px;
   }
-
-  .marquee {
-    animation: marquee 10s linear infinite;
+  
+  {% if section.settings.double_content %}
+  .marquee-track {
+    animation-duration: {{ section.settings.mobile_scroll_speed }}s;
   }
-}
-
-@media (min-width: 769px) {
-  .marquee {
-    animation: marquee 30s linear infinite;
+  {% else %}
+  .marquee-content {
+    animation-duration: {{ section.settings.mobile_scroll_speed }}s;
   }
+  {% endif %}
 }
 
 @keyframes marquee {
   0% {
-    transform: translateX(100%);
+    transform: translateX(0);
   }
   100% {
     transform: translateX(-100%);
   }
 }
-</style>
-
-<script>
-var marquee = document.querySelector('.marquee');
-
-marquee.addEventListener('mouseover', function () {
-  marquee.style.animationPlayState = 'paused';
-});
-
-marquee.addEventListener('mouseout', function () {
-  marquee.style.animationPlayState = 'running';
-});
-</script>
+{% endstyle %}
 
 {% schema %}
 {
@@ -85,28 +121,63 @@ marquee.addEventListener('mouseout', function () {
   "class": "marquee-bar",
   "settings": [
     {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text Color",
-      "default": "#65301C",  
-      "info": "Choose the color for the span text."
+      "type": "header",
+      "content": "Typography"
     },
     {
-      "type": "color",
-      "id": "border_color",
-      "label": "Border Color",
-      "default": "#65301C",  
-      "info": "Choose the color for the marquee container border."
+      "type": "select",
+      "id": "font_style",
+      "label": "Font Style",
+      "options": [
+        {
+          "value": "heading",
+          "label": "Heading Font"
+        },
+        {
+          "value": "body",
+          "label": "Body Font"
+        }
+      ],
+      "default": "heading"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Text Transform",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "uppercase",
+          "label": "UPPERCASE"
+        },
+        {
+          "value": "lowercase",
+          "label": "lowercase"
+        },
+        {
+          "value": "capitalize",
+          "label": "Capitalize"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "checkbox",
+      "id": "text_shadow",
+      "label": "Add text shadow",
+      "default": false
     },
     {
       "type": "range",
       "id": "global_font_size",
       "label": "Desktop Font Size",
       "min": 10,
-      "max": 40,
+      "max": 60,
       "step": 1,
-      "default": 22,
-      "info": "Choose the global font size for all spans."
+      "default": 22
     },
     {
       "type": "range",
@@ -115,19 +186,131 @@ marquee.addEventListener('mouseout', function () {
       "min": 10,
       "max": 40,
       "step": 1,
-      "default": 18,
-      "info": "Choose the font size for mobile devices."
+      "default": 18
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "Scroll Speed (seconds)",
+      "min": 5,
+      "max": 60,
+      "step": 5,
+      "default": 30,
+      "info": "Lower values = faster scrolling"
+    },
+    {
+      "type": "range",
+      "id": "mobile_scroll_speed",
+      "label": "Mobile Scroll Speed (seconds)",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "default": 15,
+      "info": "Lower values = faster scrolling"
+    },
+    {
+      "type": "checkbox",
+      "id": "double_content",
+      "label": "Enable seamless infinite scrolling",
+      "default": true,
+      "info": "Recommended for smooth scrolling"
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#65301C"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color",
+      "default": "#65301C"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border Width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border Radius",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "Padding",
+      "min": 0,
+      "max": 40,
+      "step": 5,
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "item_spacing",
+      "label": "Space between items",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Top Margin",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Bottom Margin",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 0
     }
   ],
   "blocks": [
     {
       "type": "marquee_block",
-      "name": "Marquee Block",
+      "name": "Text Item",
       "settings": [
         {
           "type": "text",
           "id": "span_text",
-          "label": "Span Text",
+          "label": "Text",
           "default": "Your Text Here"
         }
       ]
@@ -136,13 +319,35 @@ marquee.addEventListener('mouseout', function () {
   "presets": [
     {
       "name": "Marquee Bar",
-      "category": "Custom",
+      "settings": {
+        "text_color": "#65301C",
+        "border_color": "#65301C",
+        "double_content": true
+      },
       "blocks": [
         {
-          "type": "marquee_block"
+          "type": "marquee_block",
+          "settings": {
+            "span_text": "Free Shipping Over $75"
+          }
+        },
+        {
+          "type": "marquee_block",
+          "settings": {
+            "span_text": "Fast Delivery"
+          }
+        },
+        {
+          "type": "marquee_block",
+          "settings": {
+            "span_text": "Save 15% With Code: WELCOME"
+          }
         }
       ]
     }
-  ]
+  ],
+  "enabled_on": {
+    "templates": ["*"]
+  }
 }
 {% endschema %}
