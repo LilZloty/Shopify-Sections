@@ -27,6 +27,12 @@
   border-color: {{ section.settings.border_color }}; 
   margin-top: {{ section.settings.margin_top }}px;
   margin-bottom: {{ section.settings.margin_bottom }}px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.marquee-container:hover {
+  background-color: {{ section.settings.bg_hover_color }} !important;
+  border-color: {{ section.settings.border_hover_color }};
 }
   
 .marquee-bar {
@@ -68,11 +74,15 @@
 
 .marquee-item {
   {% if section.settings.font_style == 'heading' %}
-    font-family: var(--font-heading-family) !important;
-    font-weight: {{ settings.heading_scale | times: 100 | default: 400 }};
+    font-family: var(--font-heading-family);
+    font-style: var(--font-heading-style);
+    font-weight: var(--font-heading-weight);
+    font-size: calc({{ section.settings.global_font_size }}px * var(--font-heading-scale));
   {% else %}
-    font-family: var(--font-body-family) !important;
-    font-weight: {{ settings.body_scale | times: 100 | default: 400 }};
+    font-family: var(--font-body-family);
+    font-style: var(--font-body-style);
+    font-weight: var(--font-body-weight);
+    font-size: calc({{ section.settings.global_font_size }}px * var(--font-body-scale));
   {% endif %}
   color: {{ section.settings.text_color }};
   {% if section.settings.text_transform != 'none' %}
@@ -82,14 +92,24 @@
   {% if section.settings.text_shadow %}
     text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
   {% endif %}
-  font-size: {{ section.settings.global_font_size }}px;
   display: inline-block;
   flex-shrink: 0;
+  transition: color 0.3s ease, background-color 0.3s ease, border-radius 0.3s ease;
+}
+
+.marquee-item:hover {
+  color: {{ section.settings.text_hover_color }};
+  background-color: {{ section.settings.item_bg_hover_color }};
+  border-radius: {{ section.settings.item_hover_radius }}px;
 }
 
 @media screen and (max-width: 768px) {
   .marquee-item {
-    font-size: {{ section.settings.mobile_font_size }}px;
+    {% if section.settings.font_style == 'heading' %}
+      font-size: calc({{ section.settings.mobile_font_size }}px * var(--font-heading-scale));
+    {% else %}
+      font-size: calc({{ section.settings.mobile_font_size }}px * var(--font-body-scale));
+    {% endif %}
     padding: 0 {{ section.settings.item_spacing | divided_by: 2 }}px;
   }
   
@@ -227,7 +247,7 @@
     },
     {
       "type": "header",
-      "content": "Appearance"
+      "content": "Colors"
     },
     {
       "type": "color",
@@ -237,15 +257,52 @@
     },
     {
       "type": "color",
+      "id": "text_hover_color",
+      "label": "Text Hover Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "item_bg_hover_color",
+      "label": "Text Item Background Hover",
+      "default": "#65301C"
+    },
+    {
+      "type": "range",
+      "id": "item_hover_radius",
+      "label": "Text Item Hover Radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "color",
       "id": "background_color",
-      "label": "Background Color",
+      "label": "Container Background",
       "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "bg_hover_color",
+      "label": "Container Background Hover",
+      "default": "#F5F5F5"
     },
     {
       "type": "color",
       "id": "border_color",
       "label": "Border Color",
       "default": "#65301C"
+    },
+    {
+      "type": "color",
+      "id": "border_hover_color",
+      "label": "Border Hover Color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
     },
     {
       "type": "range",
