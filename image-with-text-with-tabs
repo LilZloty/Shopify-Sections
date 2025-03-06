@@ -1,0 +1,1063 @@
+{{ 'component-image-with-text.css' | asset_url | stylesheet_tag }}
+{{ 'section-tabs-home.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  /* Global overflow fixes */
+  #shopify-section-{{ section.id }} {
+    position: relative;
+    z-index: 1;
+  }
+
+  #shopify-section-{{ section.id }} .image-with-text,
+  #shopify-section-{{ section.id }} .image-with-text__grid,
+  #shopify-section-{{ section.id }} .grid__item,
+  #shopify-section-{{ section.id }} .image-with-text__media-item,
+  #shopify-section-{{ section.id }} .image-with-text__media-container,
+  #shopify-section-{{ section.id }} .image-with-text__media {
+    overflow: visible !important;
+  }
+
+  /* Impact overlay positioning */
+  #shopify-section-{{ section.id }} .image-with-text__media-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 30px;
+    z-index: 2;
+  }
+
+  #shopify-section-{{ section.id }} .impact-overlay {
+    position: absolute;
+    bottom: -30px;
+    left: 20px;
+    background: #ffffff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    max-width: 220px;
+    z-index: 5;
+  }
+
+  /* Z-index layering for tabs */
+  #shopify-section-{{ section.id }} .impact-tabs {
+    position: relative;
+    z-index: 1;
+  }
+
+  #shopify-section-{{ section.id }} .tab-list {
+    position: relative;
+    z-index: 2;
+  }
+
+  #shopify-section-{{ section.id }} .tab-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Accent colors */
+  #shopify-section-{{ section.id }} .impact-overlay__title {
+    color: {{ section.settings.accent_color }};
+  }
+
+  #shopify-section-{{ section.id }} .impact-point__icon {
+    background-color: {{ section.settings.accent_color }};
+  }
+
+  #shopify-section-{{ section.id }} .tab-list__button.active {
+    border-bottom-color: {{ section.settings.accent_color }};
+    color: {{ section.settings.accent_color }};
+  }
+
+  #shopify-section-{{ section.id }} .tab-icon {
+    background-color: {{ section.settings.accent_color }};
+  }
+
+  /* Mobile styles */
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .image-with-text__media-item {
+      margin-bottom: 25px;
+    }
+
+    #shopify-section-{{ section.id }} .impact-overlay {
+      bottom: -25px;
+      left: 15px;
+      padding: 0.8rem;
+      max-width: 180px;
+    }
+
+    #shopify-section-{{ section.id }} .tab-list__button.active {
+      border-left-color: {{ section.settings.accent_color }};
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign fetch_priority = 'auto'
+  if section.index == 1
+    assign fetch_priority = 'high'
+  endif
+  if section.settings.color_scheme == section.settings.section_color_scheme and section.settings.content_layout == 'no-overlap'
+    assign remove_color_classes = true
+  endif
+-%}
+
+<div class="section-{{ section.id }}-padding gradient color-{{ section.settings.section_color_scheme }}">
+  <div class="page-width">
+    <div class="image-with-text image-with-text--{{ section.settings.content_layout }} isolate{% if settings.text_boxes_border_thickness > 0 and settings.text_boxes_border_opacity > 0 and settings.media_border_thickness > 0 and settings.media_border_opacity > 0 %} collapse-borders{% endif %}{% unless section.settings.color_scheme == section.settings.section_color_scheme and settings.media_border_thickness > 0 and settings.text_boxes_shadow_opacity == 0 and settings.text_boxes_border_thickness == 0 or settings.text_boxes_border_opacity == 0 %} collapse-corners{% endunless %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+      <div class="image-with-text__grid grid grid--gapless grid--1-col grid--{% if section.settings.desktop_image_width == 'medium' %}2-col-tablet{% else %}3-col-tablet{% endif %}{% if section.settings.layout == 'text_first' %} image-with-text__grid--reverse{% endif %}">
+        <div class="image-with-text__media-item image-with-text__media-item--{{ section.settings.desktop_image_width }} image-with-text__media-item--{{ section.settings.desktop_content_position }} grid__item">
+          <div class="image-with-text__media-container">
+            <div
+              class="image-with-text__media image-with-text__media--{{ section.settings.height }} global-media-settings{% unless remove_color_classes %} gradient color-{{ section.settings.color_scheme }}{% else %} background-transparent{% endunless %}{% if section.settings.image != blank %} media{% else %} image-with-text__media--placeholder placeholder{% endif %}{% if section.settings.image_behavior != 'none' %} animate--{{ section.settings.image_behavior }}{% endif %}"
+              {% if section.settings.height == 'adapt' and section.settings.image != blank %}
+                style="padding-bottom: {{ 1 | divided_by: section.settings.image.aspect_ratio | times: 100 }}%;"
+              {% endif %}
+            >
+              {%- if section.settings.image != blank -%}
+                {%- if section.settings.image_behavior == 'ambient' or section.settings.image_behavior == 'zoom-in' -%}
+                  {%- assign widths = '198, 432, 642, 900, 1284, 1800' -%}
+                  {%- capture sizes -%}
+                    (min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: 1.6667 }}px,
+                    (min-width: 750px) calc((100vw - 130px) / 1.667), calc((100vw - 50px) / 1.667)
+                  {%- endcapture -%}
+                {%- else -%}
+                  {%- assign widths = '165, 360, 535, 750, 1070, 1500' -%}
+                  {%- capture sizes -%}
+                    (min-width: {{ settings.page_width }}px) {{ settings.page_width | minus: 100 | divided_by: 2 }}px,
+                    (min-width: 750px) calc((100vw - 130px) / 2), calc((100vw - 50px) / 2)
+                  {%- endcapture -%}
+                {%- endif -%}
+                {{
+                  section.settings.image
+                  | image_url: width: 1500
+                  | image_tag: sizes: sizes, widths: widths, fetchpriority: fetch_priority
+                }}
+              {%- else -%}
+                {{ 'detailed-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            </div>
+            
+            {% if section.settings.show_overlay %}
+              <div class="impact-overlay">
+                <p class="impact-overlay__title">{{ section.settings.overlay_title }}</p>
+                <p class="impact-overlay__subtitle">{{ section.settings.overlay_subtitle }}</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="image-with-text__text-item grid__item">
+          <div
+            id="ImageWithText--{{ section.id }}"
+            class="image-with-text__content image-with-text__content--{{ section.settings.desktop_content_position }} image-with-text__content--desktop-{{ section.settings.desktop_content_alignment }} image-with-text__content--mobile-{{ section.settings.mobile_content_alignment }} image-with-text__content--{{ section.settings.height }} content-container{% unless remove_color_classes %} gradient color-{{ section.settings.color_scheme }}{% else %} background-transparent{% endunless %}"
+          >
+            {%- for block in section.blocks -%}
+              {% case block.type %}
+                {%- when 'heading' -%}
+                  <h2
+                    class="image-with-text__heading inline-richtext {{ block.settings.heading_size }}"
+                    {{ block.shopify_attributes }}
+                  >
+                    {{ block.settings.heading }}
+                  </h2>
+                {%- when 'caption' -%}
+                  <p
+                    class="image-with-text__text image-with-text__text--caption {{ block.settings.text_style }} {{ block.settings.text_style }}--{{ block.settings.text_size }} {{ block.settings.text_style }}"
+                    {{ block.shopify_attributes }}
+                  >
+                    {{ block.settings.caption | escape }}
+                  </p>
+                {%- when 'text' -%}
+                  <div class="image-with-text__text rte {{ block.settings.text_style }}" {{ block.shopify_attributes }}>
+                    {{ block.settings.text }}
+                  </div>
+                {%- when 'bullet_points' -%}
+                  <ul class="impact-points" {{ block.shopify_attributes }}>
+                    {% for i in (1..3) %}
+                      {% assign point_text_setting = 'point_' | append: i | append: '_text' %}
+                      {% if block.settings[point_text_setting] != blank %}
+                        <li class="impact-point">
+                          <div class="impact-point__icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </div>
+                          <span class="impact-point__text">{{ block.settings[point_text_setting] }}</span>
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                {%- when 'button' -%}
+                  {%- if block.settings.button_label != blank -%}
+                    <a
+                      {% if block.settings.button_link == blank %}
+                        role="link" aria-disabled="true"
+                      {% else %}
+                        href="{{ block.settings.button_link }}"
+                      {% endif %}
+                      class="button{% if block.settings.button_style_secondary %} button--secondary{% else %} button--primary{% endif %}"
+                      {{ block.shopify_attributes }}
+                    >
+                      {{ block.settings.button_label | escape }}
+                    </a>
+                  {%- endif -%}
+              {%- endcase -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tabs Section -->
+      {% if section.settings.show_tabs %}
+        <div class="impact-tabs">
+          <ul class="tab-list" role="tablist">
+            {% comment %} Use either dynamic tabs or section settings tabs {% endcomment %}
+            {% if section.settings.use_custom_tabs %}
+              {% for i in (1..3) %}
+                {% assign tab_title_setting = 'tab_' | append: i | append: '_title' %}
+                {% if section.settings[tab_title_setting] != blank %}
+                  <li class="tab-list__item" role="presentation">
+                    <button
+                      id="tab-{{ section.id }}-settings-{{ forloop.index }}"
+                      class="tab-list__button {% if forloop.first %}active{% endif %}"
+                      role="tab"
+                      aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+                      aria-controls="tab-content-{{ section.id }}-settings-{{ forloop.index }}"
+                      data-target="tab-content-{{ section.id }}-settings-{{ forloop.index }}"
+                    >
+                      {{ section.settings[tab_title_setting] }}
+                    </button>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              {% assign tab_count = 0 %}
+              {% for block in section.blocks %}
+                {% if block.type == 'tab' %}
+                  {% assign tab_count = tab_count | plus: 1 %}
+                  <li class="tab-list__item" role="presentation">
+                    <button
+                      id="tab-{{ section.id }}-{{ tab_count }}"
+                      class="tab-list__button {% if tab_count == 1 %}active{% endif %}"
+                      role="tab"
+                      aria-selected="{% if tab_count == 1 %}true{% else %}false{% endif %}"
+                      aria-controls="tab-content-{{ section.id }}-{{ tab_count }}"
+                      data-target="tab-content-{{ section.id }}-{{ tab_count }}"
+                    >
+                      {{ block.settings.tab_title }}
+                    </button>
+                  </li>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </ul>
+          
+          <!-- Tab Content -->
+          {% if section.settings.use_custom_tabs %}
+            {% for i in (1..3) %}
+              {% assign tab_title_setting = 'tab_' | append: i | append: '_title' %}
+              {% assign tab_content_setting = 'tab_' | append: i | append: '_content' %}
+              {% if section.settings[tab_title_setting] != blank %}
+                <div
+                  id="tab-content-{{ section.id }}-settings-{{ forloop.index }}"
+                  class="tab-content {% if forloop.first %}active{% endif %}"
+                  role="tabpanel"
+                  aria-labelledby="tab-{{ section.id }}-settings-{{ forloop.index }}"
+                >
+                  <div class="tab-content-wrapper">
+                    {% if section.settings.show_tab_icons %}
+                      <div class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                        </svg>
+                      </div>
+                    {% endif %}
+                    <div class="tab-content-text rte">
+                      {{ section.settings[tab_content_setting] }}
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {% assign tab_count = 0 %}
+            {% for block in section.blocks %}
+              {% if block.type == 'tab' %}
+                {% assign tab_count = tab_count | plus: 1 %}
+                <div
+                  id="tab-content-{{ section.id }}-{{ tab_count }}"
+                  class="tab-content {% if tab_count == 1 %}active{% endif %}"
+                  role="tabpanel"
+                  aria-labelledby="tab-{{ section.id }}-{{ tab_count }}"
+                  {{ block.shopify_attributes }}
+                >
+                  <div class="tab-content-wrapper">
+                    {% if section.settings.show_tab_icons %}
+                      <div class="tab-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                        </svg>
+                      </div>
+                    {% endif %}
+                    <div class="tab-content-text rte">
+                      {{ block.settings.tab_content }}
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-list__button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons and contents
+        tabButtons.forEach(btn => {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-selected', 'false');
+        });
+        
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        this.setAttribute('aria-selected', 'true');
+        
+        // Find and show the corresponding content
+        const targetId = this.getAttribute('data-target');
+        const targetContent = document.getElementById(targetId);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Image with Tabs",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.image-with-text.settings.image.label"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.image-with-text.settings.height.options__1.label"
+        },
+        {
+          "value": "small",
+          "label": "t:sections.image-with-text.settings.height.options__2.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.image-with-text.settings.height.options__3.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.image-with-text.settings.height.options__4.label"
+        }
+      ],
+      "default": "adapt",
+      "label": "t:sections.image-with-text.settings.height.label"
+    },
+    {
+      "type": "select",
+      "id": "desktop_image_width",
+      "options": [
+        {
+          "value": "small",
+          "label": "t:sections.image-with-text.settings.desktop_image_width.options__1.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.image-with-text.settings.desktop_image_width.options__2.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.image-with-text.settings.desktop_image_width.options__3.label"
+        }
+      ],
+      "default": "medium",
+      "label": "t:sections.image-with-text.settings.desktop_image_width.label"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "options": [
+        {
+          "value": "image_first",
+          "label": "t:sections.image-with-text.settings.layout.options__1.label"
+        },
+        {
+          "value": "text_first",
+          "label": "t:sections.image-with-text.settings.layout.options__2.label"
+        }
+      ],
+      "default": "image_first",
+      "label": "t:sections.image-with-text.settings.layout.label"
+    },
+    {
+      "type": "select",
+      "id": "image_behavior",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:sections.all.animation.image_behavior.options__1.label"
+        },
+        {
+          "value": "ambient",
+          "label": "t:sections.all.animation.image_behavior.options__2.label"
+        },
+        {
+          "value": "zoom-in",
+          "label": "t:sections.all.animation.image_behavior.options__4.label"
+        }
+      ],
+      "default": "none",
+      "label": "t:sections.all.animation.image_behavior.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.image-with-text.settings.header.content"
+    }, 
+    {
+      "type": "select",
+      "id": "content_layout",
+      "options": [
+        {
+          "value": "no-overlap",
+          "label": "t:sections.image-with-text.settings.content_layout.options__1.label"
+        },
+        {
+          "value": "overlap",
+          "label": "t:sections.image-with-text.settings.content_layout.options__2.label"
+        }
+      ],
+      "default": "no-overlap",
+      "label": "t:sections.image-with-text.settings.content_layout.label"
+    },       
+    {
+      "type": "select",
+      "id": "desktop_content_position",
+      "options": [
+        {
+          "value": "top",
+          "label": "t:sections.image-with-text.settings.desktop_content_position.options__1.label"
+        },
+        {
+          "value": "middle",
+          "label": "t:sections.image-with-text.settings.desktop_content_position.options__2.label"
+        },
+        {
+          "value": "bottom",
+          "label": "t:sections.image-with-text.settings.desktop_content_position.options__3.label"
+        }
+      ],
+      "default": "top",
+      "label": "t:sections.image-with-text.settings.desktop_content_position.label"
+    },
+    {
+      "type": "select",
+      "id": "desktop_content_alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.image-with-text.settings.desktop_content_alignment.options__1.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.image-with-text.settings.desktop_content_alignment.options__2.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.image-with-text.settings.desktop_content_alignment.options__3.label"
+        }
+      ],
+      "default": "left",
+      "label": "t:sections.image-with-text.settings.desktop_content_alignment.label"
+    },
+    {
+      "type": "select",
+      "id": "mobile_content_alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__1.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__2.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.image-with-text.settings.mobile_content_alignment.options__3.label"
+        }
+      ],
+      "default": "left",
+      "label": "t:sections.image-with-text.settings.mobile_content_alignment.label"
+    },
+    {
+      "type": "header",
+      "content": "Image Overlay Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay",
+      "label": "Show impact overlay",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "overlay_title",
+      "label": "Overlay title",
+      "default": "$25,000+"
+    },
+    {
+      "type": "text",
+      "id": "overlay_subtitle",
+      "label": "Overlay subtitle",
+      "default": "Donated to research in 2023"
+    },
+    {
+      "type": "header",
+      "content": "Tab Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tabs",
+      "label": "Show tabs section",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "use_custom_tabs",
+      "label": "Use predefined tabs",
+      "default": false,
+      "info": "When enabled, uses the tabs defined in settings instead of block-based tabs"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tab_icons",
+      "label": "Show icons before tab content",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "tab_1_title",
+      "label": "Tab 1 title",
+      "default": "10% of proceeds donated to research organizations",
+      "info": "Only used if 'Use predefined tabs' is enabled"
+    },
+    {
+      "type": "richtext",
+      "id": "tab_1_content",
+      "label": "Tab 1 content",
+      "default": "<p>We're committed to donating 10% of our proceeds to organizations that are leading the fight against cancer and chronic illnesses. These funds help support groundbreaking research, patient care programs, and awareness initiatives.</p>",
+      "info": "Only used if 'Use predefined tabs' is enabled"
+    },
+    {
+      "type": "text",
+      "id": "tab_2_title",
+      "label": "Tab 2 title",
+      "default": "Supporting local Los Angeles community initiatives",
+      "info": "Only used if 'Use predefined tabs' is enabled"
+    },
+    {
+      "type": "richtext",
+      "id": "tab_2_content",
+      "label": "Tab 2 content",
+      "default": "<p>We believe in giving back to our local community through partnerships with LA-based organizations focused on health and wellness.</p>",
+      "info": "Only used if 'Use predefined tabs' is enabled"
+    },
+    {
+      "type": "text",
+      "id": "tab_3_title",
+      "label": "Tab 3 title",
+      "default": "Transparent reporting on our contributions",
+      "info": "Only used if 'Use predefined tabs' is enabled"
+    },
+    {
+      "type": "richtext",
+      "id": "tab_3_content",
+      "label": "Tab 3 content",
+      "default": "<p>We're committed to being fully transparent about where your money goes. We regularly publish reports detailing our contributions.</p>",
+      "info": "Only used if 'Use predefined tabs' is enabled"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#E43C5C"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.image-with-text.settings.header_colors.content"
+    },        
+    {
+      "type": "color_scheme",
+      "id": "section_color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.multirow.settings.container_color_scheme.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "t:sections.image-with-text.blocks.heading.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "Making a Difference with Every Purchase",
+          "label": "t:sections.image-with-text.blocks.heading.settings.heading.label"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            {
+              "value": "h2",
+              "label": "t:sections.all.heading_size.options__1.label"
+            },
+            {
+              "value": "h1",
+              "label": "t:sections.all.heading_size.options__2.label"
+            },
+            {
+              "value": "h0",
+              "label": "t:sections.all.heading_size.options__3.label"
+            },
+            {
+              "value": "hxl",
+              "label": "t:sections.all.heading_size.options__4.label"
+            },
+            {
+              "value": "hxxl",
+              "label": "t:sections.all.heading_size.options__5.label"
+            }
+          ],
+          "default": "h1",
+          "label": "t:sections.all.heading_size.label"
+        }
+      ]
+    },
+    {
+      "type": "caption",
+      "name": "t:sections.image-with-text.blocks.caption.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "caption",
+          "default": "Add a tagline",
+          "label": "t:sections.image-with-text.blocks.caption.settings.text.label"
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "options": [
+            {
+              "value": "subtitle",
+              "label": "t:sections.image-with-text.blocks.caption.settings.text_style.options__1.label"
+            },
+            {
+              "value": "caption-with-letter-spacing",
+              "label": "t:sections.image-with-text.blocks.caption.settings.text_style.options__2.label"
+            }
+          ],
+          "default": "caption-with-letter-spacing",
+          "label": "t:sections.image-with-text.blocks.caption.settings.text_style.label"
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "options": [
+            {
+              "value": "small",
+              "label": "t:sections.image-with-text.blocks.caption.settings.caption_size.options__1.label"
+            },
+            {
+              "value": "medium",
+              "label": "t:sections.image-with-text.blocks.caption.settings.caption_size.options__2.label"
+            },
+            {
+              "value": "large",
+              "label": "t:sections.image-with-text.blocks.caption.settings.caption_size.options__3.label"
+            }
+          ],
+          "default": "medium",
+          "label": "t:sections.image-with-text.blocks.caption.settings.caption_size.label"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "t:sections.image-with-text.blocks.text.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>We've partnered with leading research organizations to ensure your purchase has a real impact. From funding innovative cancer treatments to supporting those with chronic illnesses, your style choices are helping create a better future.</p>",
+          "label": "t:sections.image-with-text.blocks.text.settings.text.label"
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "options": [
+            {
+              "value": "body",
+              "label": "t:sections.image-with-text.blocks.text.settings.text_style.options__1.label"
+            },
+            {
+              "value": "subtitle",
+              "label": "t:sections.image-with-text.blocks.text.settings.text_style.options__2.label"
+            }
+          ],
+          "default": "body",
+          "label": "t:sections.image-with-text.blocks.text.settings.text_style.label"
+        }
+      ]
+    },
+    {
+      "type": "bullet_points",
+      "name": "Impact Points",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "point_1_text",
+          "label": "Point 1",
+          "default": "10% of proceeds donated to research organizations"
+        },
+        {
+          "type": "text",
+          "id": "point_2_text",
+          "label": "Point 2",
+          "default": "Supporting local Los Angeles community initiatives"
+        },
+        {
+          "type": "text",
+          "id": "point_3_text",
+          "label": "Point 3",
+          "default": "Transparent reporting on our contributions"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "t:sections.image-with-text.blocks.button.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_label",
+          "default": "Learn About Our Impact",
+          "label": "t:sections.image-with-text.blocks.button.settings.button_label.label",
+          "info": "t:sections.image-with-text.blocks.button.settings.button_label.info"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "t:sections.image-with-text.blocks.button.settings.button_link.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "button_style_secondary",
+          "default": false,
+          "label": "t:sections.image-with-text.blocks.button.settings.outline_button.label"
+        }
+      ]
+    },
+    {
+      "type": "tab",
+      "name": "Tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_title",
+          "label": "Tab title",
+          "default": "Research Impact"
+        },
+        {
+          "type": "richtext",
+          "id": "tab_content",
+          "label": "Tab content",
+          "default": "<p>We're committed to donating 10% of our proceeds to organizations that are leading the fight against cancer and chronic illnesses. These funds help support groundbreaking research, patient care programs, and awareness initiatives.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with Tabs",
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "bullet_points"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_title": "10% of proceeds donated to research organizations",
+            "tab_content": "<p>We're committed to donating 10% of our proceeds to organizations that are leading the fight against cancer and chronic illnesses. These funds help support groundbreaking research.</p>"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_title": "Supporting local Los Angeles community initiatives",
+            "tab_content": "<p>We believe in giving back to our local Los Angeles community through partnerships with organizations focused on health and wellness.</p>"
+          }
+        },
+        {
+          "type": "tab",
+          "settings": {
+            "tab_title": "Transparent reporting on our contributions",
+            "tab_content": "<p>We regularly publish reports detailing our contributions to ensure full transparency about where your money goes.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+
+{{ 'section-tabs-home.css' | asset_url | stylesheet_tag }} below add this in assets.
+/* Impact overlay text styles */
+.impact-overlay__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.2;
+}
+
+.impact-overlay__subtitle {
+  font-size: 0.9rem;
+  color: rgba(var(--color-foreground), 0.75);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Impact bullet points */
+.impact-points {
+  margin: 2rem 0;
+  list-style: none;
+  padding: 0;
+}
+
+.impact-point {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.impact-point__icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.impact-point__icon svg {
+  width: 14px;
+  height: 14px;
+  color: #ffffff;
+}
+
+.impact-point__text {
+  font-size: 1rem;
+  color: rgb(var(--color-foreground));
+}
+
+/* Tabs styling */
+.impact-tabs {
+  margin-top: 1.5rem;
+}
+
+.tab-list {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-bottom: 1px solid rgba(var(--color-foreground), 0.1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tab-list::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-list__item {
+  margin-right: 1rem;
+  margin-bottom: -1px;
+}
+
+.tab-list__button {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.75rem 0.25rem;
+  cursor: pointer;
+  font-weight: 500;
+  color: rgba(var(--color-foreground), 0.7);
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.tab-list__button:hover {
+  color: rgba(var(--color-foreground), 1);
+}
+
+.tab-content {
+  display: none;
+  padding: 1.5rem 0;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content-wrapper {
+  display: flex;
+  align-items: flex-start;
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  margin-right: 12px;
+  margin-top: 3px;
+}
+
+.tab-icon svg {
+  width: 14px;
+  height: 14px;
+  color: #ffffff;
+}
+
+.tab-content-text {
+  flex: 1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Mobile styles */
+@media screen and (max-width: 749px) {
+  .impact-overlay__title {
+    font-size: 1.2rem;
+  }
+
+  .impact-overlay__subtitle {
+    font-size: 0.8rem;
+  }
+
+  .tab-list {
+    flex-direction: column;
+    border-bottom: none;
+  }
+
+  .tab-list__item {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+
+  .tab-list__button {
+    width: 100%;
+    text-align: left;
+    padding: 10px 5px;
+    border-left: 2px solid transparent;
+    border-bottom: none;
+  }
+
+  .tab-list__button.active {
+    background-color: rgba(var(--color-foreground), 0.04);
+  }
+}
