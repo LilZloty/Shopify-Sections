@@ -11,7 +11,7 @@
     </div>
   {%- endif -%}
 
-  <div class="tiktok-grid layout-{{ section.settings.layout_style }}" style="--grid-columns: {{ section.settings.columns_desktop }};">
+  <div class="tiktok-grid layout-{{ section.settings.layout_style }}">
     {% for block in section.blocks %}
       {% if block.type == 'video' %}
         <div class="tiktok-content{% if section.settings.enable_hover_effect %} hover-effect{% endif %}" {{ block.shopify_attributes }}>
@@ -120,17 +120,17 @@
 
   .tiktok-grid {
     width: 100%;
-    max-width: 100%;
+    max-width: 1000px;
     margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: {{ section.settings.spacing }}px;
   }
 
-  .layout-grid {
-    display: grid;
-    grid-template-columns: repeat(var(--grid-columns), 1fr);
-    grid-gap: {{ section.settings.spacing }}px;
-    width: 100%;
-    max-width: 100%;
-    justify-content: center;
+  .tiktok-content {
+    width: calc((100% - ({{ section.settings.columns_desktop }} - 1) * {{ section.settings.spacing }}px) / {{ section.settings.columns_desktop }});
+    max-width: calc((100% - ({{ section.settings.columns_desktop }} - 1) * {{ section.settings.spacing }}px) / {{ section.settings.columns_desktop }});
   }
 
   .layout-carousel {
@@ -139,12 +139,13 @@
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    grid-template-columns: unset;
     gap: {{ section.settings.spacing }}px;
     padding: 5px 0;
   }
 
   .layout-carousel .tiktok-content {
-    flex: 0 0 calc((100% - (var(--grid-columns) - 1) * {{ section.settings.spacing }}px) / var(--grid-columns));
+    flex: 0 0 calc((100% - ({{ section.settings.columns_desktop }} - 1) * {{ section.settings.spacing }}px) / {{ section.settings.columns_desktop }});
     scroll-snap-align: start;
     margin-right: 0;
   }
@@ -167,9 +168,8 @@
 
   .tiktok-video-container {
     position: relative;
+    aspect-ratio: {{ section.settings.aspect_ratio }};
     width: 100%;
-    max-height: {{ section.settings.max_video_height }}px;
-    height: auto;
     overflow: hidden;
     border-radius: {{ section.settings.border_radius }}px;
   }
@@ -177,7 +177,6 @@
   .tiktok-video-container video {
     width: 100%;
     height: 100%;
-    max-height: {{ section.settings.max_video_height }}px;
     object-fit: cover;
     display: block;
   }
@@ -237,6 +236,7 @@
   .button-container {
     width: 100%;
     margin-top: 30px;
+    text-align: center;
   }
 
   .tiktok-button {
@@ -255,8 +255,9 @@
   }
 
   @media (max-width: 990px) {
-    .layout-grid {
-      grid-template-columns: repeat({{ section.settings.columns_tablet }}, 1fr);
+    .tiktok-content {
+      width: calc((100% - ({{ section.settings.columns_tablet }} - 1) * {{ section.settings.spacing }}px) / {{ section.settings.columns_tablet }});
+      max-width: calc((100% - ({{ section.settings.columns_tablet }} - 1) * {{ section.settings.spacing }}px) / {{ section.settings.columns_tablet }});
     }
     
     .layout-carousel .tiktok-content {
@@ -265,8 +266,9 @@
   }
   
   @media (max-width: 749px) {
-    .layout-grid {
-      grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+    .tiktok-content {
+      width: calc((100% - ({{ section.settings.columns_mobile }} - 1) * {{ section.settings.spacing }}px) / {{ section.settings.columns_mobile }});
+      max-width: calc((100% - ({{ section.settings.columns_mobile }} - 1) * {{ section.settings.spacing }}px) / {{ section.settings.columns_mobile }});
     }
     
     .layout-carousel .tiktok-content {
@@ -371,13 +373,20 @@
       "default": 2
     },
     {
-      "type": "range",
+      "type": "select",
       "id": "columns_mobile",
-      "min": 1,
-      "max": 2,
-      "step": 0.5,
       "label": "Videos per row (Mobile)",
-      "default": 1
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
     },
     {
       "type": "range",
@@ -391,13 +400,13 @@
     },
     {
       "type": "range",
-      "id": "max_video_height",
-      "min": 200,
-      "max": 800,
-      "step": 50,
-      "unit": "px",
-      "label": "Maximum Video Height",
-      "default": 400
+      "id": "aspect_ratio",
+      "min": 0.5,
+      "max": 2.0,
+      "step": 0.1,
+      "label": "Video Aspect Ratio",
+      "info": "Width:Height (0.5 is tall/portrait, 1.0 is square, 1.8 is landscape)",
+      "default": 0.6
     },
     {
       "type": "header",
