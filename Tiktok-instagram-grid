@@ -1,24 +1,70 @@
 <div class="social-media-content h1 scroll-trigger animate--slide-in page-width section-{{ section.id }}-padding color-{{ section.settings.color_scheme }}" >
-  {% if section.settings.tiktok_url_1 != blank %}
-    <div class="tiktok-content">
-      <video src="{{ section.settings.tiktok_url_1 }}" controls loading="lazy"></video>
+  {%- if section.settings.heading != blank -%}
+    <h2 class="tiktok-heading {{ section.settings.heading_size }}">
+      {{ section.settings.heading | escape }}
+    </h2>
+  {%- endif -%}
+  
+  {%- if section.settings.description != blank -%}
+    <div class="tiktok-description rte">
+      {{ section.settings.description }}
     </div>
-  {% endif %}
-  {% if section.settings.tiktok_url_2 != blank %}
-    <div class="tiktok-content">
-      <video src="{{ section.settings.tiktok_url_2 }}" controls loading="lazy"></video>
-    </div>
-  {% endif %}
-  {% if section.settings.tiktok_url_3 != blank %}
-    <div class="tiktok-content">
-      <video src="{{ section.settings.tiktok_url_3 }}" controls loading="lazy"></video>
-    </div>
-  {% endif %}
-  {% if section.settings.tiktok_url_4 != blank %}
-    <div class="tiktok-content">
-      <video src="{{ section.settings.tiktok_url_4 }}" controls loading="lazy"></video>
-    </div>
-  {% endif %}
+  {%- endif -%}
+
+  <div class="tiktok-grid layout-{{ section.settings.layout_style }}" style="--grid-columns: {{ section.settings.columns_desktop }};">
+    {% for block in section.blocks %}
+      {% if block.type == 'video' %}
+        <div class="tiktok-content{% if section.settings.enable_hover_effect %} hover-effect{% endif %}" {{ block.shopify_attributes }}>
+          <div class="tiktok-video-container">
+            {% if section.settings.show_play_overlay %}
+              <div class="tiktok-play-overlay">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 5V19L19 12L8 5Z" fill="currentColor"/>
+                </svg>
+              </div>
+            {% endif %}
+            
+            <video 
+              src="{{ block.settings.video_url }}" 
+              {% if section.settings.autoplay %}autoplay muted{% endif %} 
+              {% if section.settings.show_controls %}controls{% endif %} 
+              loading="lazy"
+              {% if section.settings.loop %}loop{% endif %}
+              poster="{% if block.settings.thumbnail %}{{ block.settings.thumbnail | img_url: 'master' }}{% endif %}"
+            ></video>
+          </div>
+          
+          {% if block.settings.title != blank %}
+            <h3 class="tiktok-video-title">{{ block.settings.title }}</h3>
+          {% endif %}
+          
+          {% if block.settings.caption != blank %}
+            <p class="tiktok-video-caption">{{ block.settings.caption }}</p>
+          {% endif %}
+          
+          {% if section.settings.show_share_buttons %}
+            <div class="tiktok-share-buttons">
+              <button class="share-button" aria-label="Share on Twitter">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z" fill="currentColor"/>
+                </svg>
+              </button>
+              <button class="share-button" aria-label="Share on Facebook">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h8.62v-6.97h-2.35v-2.73h2.35V9c0-2.33 1.42-3.6 3.5-3.6 1 0 1.84.07 2.1.1v2.43h-1.43c-1.13 0-1.35.54-1.35 1.32v1.73h2.7l-.35 2.73h-2.35V21H20a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1z" fill="currentColor"/>
+                </svg>
+              </button>
+              <button class="share-button" aria-label="Copy Link">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" fill="currentColor"/>
+                </svg>
+              </button>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
   
   <div class="button-container">
     {%- if section.settings.button_label != blank -%}
@@ -27,8 +73,11 @@
           role="link" aria-disabled="true"
         {% else %}
           href="{{ section.settings.button_link }}"
+          {% if section.settings.button_target %}target="_blank"{% endif %}
+          {% if section.settings.add_utm %}?utm_source=website&utm_medium=tiktok_section&utm_campaign={{ section.settings.utm_campaign }}{% endif %}
         {% endif %}
-        class="tiktok-button"
+        class="tiktok-button button{% if section.settings.button_style == 'secondary' %} button--secondary{% endif %}"
+        style="--button-color: {{ section.settings.button_color }}; --button-text-color: {{ section.settings.button_text_color }};"
       >
         {{- section.settings.button_label | escape -}}
       </a>
@@ -51,83 +100,447 @@
   }
 
   .social-media-content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  align-items: flex-start; /* Align items to the top */
-  text-align: center; /* Center align the content */
-}
-
-.tiktok-content {
-  flex: 1 1 calc(25% - 20px);
-  max-width: calc(25% - 20px);
-  position: relative;
-}
-
-.tiktok-content video {
-  width: 100%;
-  max-height: 720px;
-  object-fit: cover;
-}
-
-.button-container {
-  width: 100%;
-  margin-top: 20px; /* Add margin to separate from TikTok videos */
-}
-
-.tiktok-button {
-  background-color: #EF2950;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-decoration: none;
-  font-size: 18px;
-  transition: background-color 0.3s ease-in-out;
-}
-
-.tiktok-button:hover {
-  background-color: #ff5678; 
-}
-
-/* Desktops and larger screens */
-@media (min-width: 1025px) {
-  .tiktok-content {
-    flex: 1 1 calc(25% - 20px);
-    max-width: calc(25% - 20px);
+    display: flex;
+    flex-direction: column;
+    gap: {{ section.settings.spacing }}px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
   }
-}
-  
-@media (max-width: 768px) {
-  .social-media-content {
-    flex-wrap: wrap;
-    justify-content: flex-start; /* Align items to the start */
+
+  .tiktok-heading {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+
+  .tiktok-description {
+    margin-bottom: 25px;
+    max-width: {{ section.settings.description_width }}px;
+  }
+
+  .tiktok-grid {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .layout-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-columns), 1fr);
+    grid-gap: {{ section.settings.spacing }}px;
+    width: 100%;
+    max-width: 100%;
+    justify-content: center;
+  }
+
+  .layout-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    gap: {{ section.settings.spacing }}px;
+    padding: 5px 0;
+  }
+
+  .layout-carousel .tiktok-content {
+    flex: 0 0 calc((100% - (var(--grid-columns) - 1) * {{ section.settings.spacing }}px) / var(--grid-columns));
+    scroll-snap-align: start;
+    margin-right: 0;
   }
 
   .tiktok-content {
-    flex: 1 1 calc(50% - 10px); /* Two clips per row */
-    max-width: calc(50% - 10px); /* Two clips per row */
+    position: relative;
+    border-radius: {{ section.settings.border_radius }}px;
+    overflow: hidden;
+    width: 100%;
+    {% if section.settings.enable_box_shadow %}
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    {% endif %}
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .tiktok-content.hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .tiktok-video-container {
+    position: relative;
+    width: 100%;
+    max-height: {{ section.settings.max_video_height }}px;
+    height: auto;
+    overflow: hidden;
+    border-radius: {{ section.settings.border_radius }}px;
+  }
+
+  .tiktok-video-container video {
+    width: 100%;
+    height: 100%;
+    max-height: {{ section.settings.max_video_height }}px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .tiktok-play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 2;
+    color: white;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .tiktok-content:hover .tiktok-play-overlay {
+    opacity: 1;
+  }
+
+  .tiktok-video-title {
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 1.1em;
+  }
+
+  .tiktok-video-caption {
+    margin-top: 5px;
+    font-size: 0.9em;
+    opacity: 0.8;
+  }
+
+  .tiktok-share-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .share-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: {{ section.settings.icon_color }};
+    transition: color 0.3s ease;
+  }
+
+  .share-button:hover {
+    color: {{ section.settings.icon_hover_color }};
+  }
+
+  .button-container {
+    width: 100%;
+    margin-top: 30px;
   }
 
   .tiktok-button {
-    width: 100%; /* Full width button */
-    margin-top: 20px; /* Add margin to separate from TikTok videos */
+    background-color: var(--button-color, #EF2950);
+    color: var(--button-text-color, white);
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 18px;
+    transition: opacity 0.3s ease-in-out;
+    display: inline-block;
   }
-}
+
+  .tiktok-button:hover {
+    opacity: 0.9;
+  }
+
+  @media (max-width: 990px) {
+    .layout-grid {
+      grid-template-columns: repeat({{ section.settings.columns_tablet }}, 1fr);
+    }
+    
+    .layout-carousel .tiktok-content {
+      flex: 0 0 calc((100% - ({{ section.settings.columns_tablet }} - 1) * {{ section.settings.spacing }}px) / {{ section.settings.columns_tablet }});
+    }
+  }
+  
+  @media (max-width: 749px) {
+    .layout-grid {
+      grid-template-columns: repeat({{ section.settings.columns_mobile }}, 1fr);
+    }
+    
+    .layout-carousel .tiktok-content {
+      flex: 0 0 calc((100% - ({{ section.settings.columns_mobile }} - 1) * {{ section.settings.spacing }}px) / {{ section.settings.columns_mobile }});
+    }
+    
+    .tiktok-button {
+      width: 100%;
+    }
+  }
 {%- endstyle -%}
 
 
 {% schema %}
 {
-  "name": "Tiktok",
+  "name": "TikTok Videos",
   "tag": "section",
   "class": "tiktok-section",
   "settings": [
     {
+      "type": "header",
+      "content": "Section Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Our TikTok Videos"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading Size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Check out our latest TikTok content</p>"
+    },
+    {
+      "type": "range",
+      "id": "description_width",
+      "min": 400,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "label": "Description Max Width",
+      "default": 800
+    },
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "select",
+      "id": "layout_style",
+      "label": "Layout Style",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Videos per row (Desktop)",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_tablet",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Videos per row (Tablet)",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "columns_mobile",
+      "min": 1,
+      "max": 2,
+      "step": 0.5,
+      "label": "Videos per row (Mobile)",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "min": 10,
+      "max": 40,
+      "step": 5,
+      "unit": "px",
+      "label": "Spacing between videos",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "max_video_height",
+      "min": 200,
+      "max": 800,
+      "step": 50,
+      "unit": "px",
+      "label": "Maximum Video Height",
+      "default": 400
+    },
+    {
+      "type": "header",
+      "content": "Video Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Autoplay videos (muted)",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Loop videos",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_controls",
+      "label": "Show video controls",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_play_overlay",
+      "label": "Show play button overlay",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share_buttons",
+      "label": "Show social share buttons",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Style Settings"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Border Radius",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_box_shadow",
+      "label": "Enable Box Shadow",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_hover_effect",
+      "label": "Enable Hover Animation",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "icon_hover_color",
+      "label": "Icon Hover Color",
+      "default": "#EF2950"
+    },
+    {
+      "type": "header",
+      "content": "Button Settings"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Follow Us on TikTok"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_target",
+      "label": "Open in new tab",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button Style",
+      "options": [
+        {
+          "value": "primary",
+          "label": "Primary"
+        },
+        {
+          "value": "secondary",
+          "label": "Secondary"
+        }
+      ],
+      "default": "primary"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Color",
+      "default": "#EF2950"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button Text Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "checkbox",
+      "id": "add_utm",
+      "label": "Add UTM Parameters",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "utm_campaign",
+      "label": "UTM Campaign Name",
+      "default": "tiktok_promo"
+    },
+    {
+      "type": "header",
+      "content": "Section Settings"
+    },
+    {
       "type": "color_scheme",
       "id": "color_scheme",
-      "label": "t:sections.all.colors.label",
-      "default": "scheme-1"
+      "label": "Color scheme",
+      "default": "background-1"
     },
     {
       "type": "range",
@@ -136,7 +549,7 @@
       "max": 100,
       "step": 4,
       "unit": "px",
-      "label": "t:sections.all.padding.padding_top",
+      "label": "Padding Top",
       "default": 40
     },
     {
@@ -146,46 +559,63 @@
       "max": 100,
       "step": 4,
       "unit": "px",
-      "label": "t:sections.all.padding.padding_bottom",
+      "label": "Padding Bottom",
       "default": 52
-    },
+    }
+  ],
+  "blocks": [
     {
-      "type": "text",
-      "id": "tiktok_url_1",
-      "label": "URL from Shopify content files"
-    },
-    {
-      "type": "text",
-      "id": "tiktok_url_2",
-      "label": "URL from Shopify content"
-    },
-    {
-      "type": "text",
-      "id": "tiktok_url_3",
-      "label": "URL from Shopify content"
-    },
-    {
-      "type": "text",
-      "id": "tiktok_url_4",
-      "label": "URL from Shopify content"
-    },
-    {
-      "type": "text",
-      "id": "button_label",
-      "label": "Button Label"
-    },
-    {
-      "type": "url",
-      "id": "button_link",
-      "label": "Button Link"
+      "type": "video",
+      "name": "TikTok Video",
+      "limit": 8,
+      "settings": [
+        {
+          "type": "text",
+          "id": "video_url",
+          "label": "Video URL",
+          "info": "Enter the URL from Shopify files or CDN"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Video Title"
+        },
+        {
+          "type": "textarea",
+          "id": "caption",
+          "label": "Video Caption"
+        },
+        {
+          "type": "image_picker",
+          "id": "thumbnail",
+          "label": "Custom Thumbnail (Optional)"
+        }
+      ]
     }
   ],
   "presets": [
     {
-      "name": "TikTok",
-      "category": "Social Media"
+      "name": "TikTok Gallery",
+      "category": "Social Media",
+      "blocks": [
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        },
+        {
+          "type": "video"
+        }
+      ],
+      "settings": {
+        "heading": "Our TikTok Videos",
+        "button_label": "Follow Us on TikTok"
+      }
     }
   ]
 }
 {% endschema %}
-
